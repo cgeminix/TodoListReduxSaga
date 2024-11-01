@@ -22,3 +22,30 @@ export const fetchTodosSelector = selector({
     return response.ok ? await response.json() : get(todoListState);
   },
 });
+
+// Hàm API để thêm ToDo
+export const addTodoApi = async (todo) => {
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(todo),
+  });
+  return response.ok ? await response.json() : null;
+};
+
+// Hàm API để xóa ToDo
+export const deleteTodoApi = async (id) => {
+  const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+  return response.ok;
+};
+
+// Hàm API để chỉnh sửa ToDo
+export const editTodoApi = async (todo) => {
+  const response = await fetch(`${API_URL}/${todo.id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(todo),
+  });
+  return response.ok ? await response.json() : null;
+};
+

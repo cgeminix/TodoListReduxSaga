@@ -1,32 +1,28 @@
 import React, { useState } from 'react';
 import { View, Text, Button, TextInput } from 'react-native';
 import { useRecoilState } from 'recoil';
-import { todoListState } from '../todoAtoms';
+import { todoListState, deleteTodoApi, editTodoApi } from '../todoAtoms';
 
 const TodoItem = ({ todo }) => {
   const [todos, setTodos] = useRecoilState(todoListState);
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(todo.name);
 
-  const updateTodo = async () => {
-    const updatedTodo = { ...todo, name: editText };
-    const response = await fetch(`${API_URL}/${todo.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedTodo),
-    });
-    if (response.ok) {
-      setTodos((oldTodos) =>
-        oldTodos.map((t) => (t.id === todo.id ? updatedTodo : t))
-      );
-      setIsEditing(false);
+  const handleDeleteTodo = async () => {
+    const isDeleted = await deleteTodoApi(todo.id);
+    if (isDeleted) {
+      setTodos((oldTodos) => oldTodos.filter((t) => t.id !== todo.id));
     }
   };
 
-  const deleteTodo = async () => {
-    const response = await fetch(`${API_URL}/${todo.id}`, { method: 'DELETE' });
-    if (response.ok) {
-      setTodos((oldTodos) => oldTodos.filter((t) => t.id !== todo.id));
+  const handleEditTodo = async () => {
+    const updatedTodo = { ...todo, name: editText };
+    const editedTodo = await editTodoApi(updatedTodo);
+    if (editedTodo) {
+      setTodos((oldTodos) =>
+        oldTodos.map((t) => (t.id === todo.id ? editedTodo : t))
+      );
+      setIsEditing(false);
     }
   };
 
@@ -53,14 +49,14 @@ const TodoItem = ({ todo }) => {
               paddingHorizontal: 8,
             }}
           />
-          <Button title="Save" onPress={updateTodo} />
+          <Button title="Save" onPress={handleEditTodo} />
         </>
       ) : (
         <>
           <Text>{todo.name}</Text>
           <View style={{ flexDirection: 'row' }}>
             <Button title="Edit" onPress={() => setIsEditing(true)} />
-            <Button title="Delete" onPress={deleteTodo} />
+            <Button title="Delete" onPress={handleDeleteTodo} />
           </View>
         </>
       )}

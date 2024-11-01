@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Button, TextInput, FlatList, ActivityIndicator } from 'react-native';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { todoListState, fetchTodosSelector } from '../todoAtoms';
+import { View, TextInput, Button, FlatList, ActivityIndicator } from 'react-native';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { todoListState, fetchTodosSelector, addTodoApi } from '../todoAtoms';
 import TodoItem from './TodoItem';
 
 const TodoList = () => {
@@ -11,17 +11,13 @@ const TodoList = () => {
 
   useEffect(() => {
     setTodos(fetchedTodos);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fetchedTodos]);
 
-  const addTodo = async () => {
+  const handleAddTodo = async () => {
     const newTodo = { name: newTodoText, completed: false };
-    const response = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newTodo),
-    });
-    if (response.ok) {
-      const addedTodo = await response.json();
+    const addedTodo = await addTodoApi(newTodo);
+    if (addedTodo) {
       setTodos((oldTodos) => [...oldTodos, addedTodo]);
       setNewTodoText('');
     }
@@ -35,16 +31,15 @@ const TodoList = () => {
         value={newTodoText}
         onChangeText={setNewTodoText}
         placeholder="Add a new todo"
-        style={{
-          borderWidth: 1,
-          borderColor: 'gray',
-          paddingHorizontal: 8,
-          marginBottom: 10,
-          marginTop: 10,
-          height: 40
-        }}
+        style={{ 
+          borderWidth: 1, 
+          borderColor: 'gray', 
+          paddingHorizontal: 8, 
+          marginBottom: 10 , 
+          marginTop:10, 
+          height: 40}}
       />
-      <Button title="Add Todo" onPress={addTodo} />
+      <Button title="Add Todo" onPress={handleAddTodo} />
       <FlatList
         data={todos}
         renderItem={({ item }) => <TodoItem todo={item} />}
