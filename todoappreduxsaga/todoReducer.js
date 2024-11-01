@@ -19,6 +19,13 @@ const todoReducer = (state = initialState, action) => {
       return { ...state, loading: false, todos: action.payload };
     case 'FETCH_TODOS_FAILURE':
       return { ...state, loading: false, error: action.payload };
+    case 'EDIT_TODO':
+      return {
+        ...state,
+        todos: state.todos.map((todo) =>
+          todo.id === action.payload.id ? action.payload : todo
+        ),
+      };
     default:
       return state;
   }

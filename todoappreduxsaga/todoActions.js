@@ -32,3 +32,12 @@ export const removeTodoAsync = (id) => ({
   type: 'REMOVE_TODO_ASYNC',
   payload: id,
 });
+export const editTodo = (todo) => ({
+  type: 'EDIT_TODO',
+  payload: todo,
+});
+
+export const editTodoAsync = (todo) => ({
+  type: 'EDIT_TODO_ASYNC',
+  payload: todo,
+});

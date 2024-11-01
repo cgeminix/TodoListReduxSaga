@@ -5,6 +5,7 @@ import {
   fetchTodosSuccess,
   fetchTodosFailure,
   removeTodo,
+  editTodo,
 } from './todoActions';
 
 const API_URL = 'https://654325f301b5e279de1ff315.mockapi.io/api/v1/TodoApp';
@@ -63,10 +64,27 @@ function* removeTodoAsyncSaga(action) {
     console.error('Error deleting todo:', error);
   }
 }
-
+// Hàm gọi API để chỉnh sửa ToDo
+function editTodoApi(todo) {
+  return fetch(`${API_URL}/${todo.id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(todo),
+  }).then((response) => response.json());
+}
+// Saga để cập nhật ToDo trên API và Redux
+function* editTodoAsyncSaga(action) {
+  try {
+    const updatedTodo = yield call(editTodoApi, action.payload);
+    yield put(editTodo(updatedTodo)); // Cập nhật Redux với ToDo đã chỉnh sửa
+  } catch (error) {
+    console.error('Error editing todo:', error);
+  }
+}
 // Watcher Saga
 export default function* watchTodoSaga() {
   yield takeEvery('FETCH_TODOS', fetchTodosSaga);
   yield takeEvery('ADD_TODO_ASYNC', addTodoAsyncSaga);
   yield takeEvery('REMOVE_TODO_ASYNC', removeTodoAsyncSaga);
+  yield takeEvery('EDIT_TODO_ASYNC', editTodoAsyncSaga);
 }
